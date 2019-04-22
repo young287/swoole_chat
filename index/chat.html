@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+    <meta charset="UTF-8">
+    <title>Direct Messaging</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="css/reset.min.css">
+
+
+    <link rel="stylesheet" href="css/style.css">
+
+
+</head>
+
+<body>
+<div class="wrapper">
+    <div class="container">
+        <div class="left">
+            <div class="top">
+                <!--<input type="text" placeholder="Search" />-->
+                <!--<a href="javascript:;" class="search"></a>-->
+            </div>
+            <ul class="people" style="overflow-y:auto;height:500px;overflow-x: hidden">
+
+                <li class="person" data-chat="person2">
+                    <img src="img/dog.png" alt="" />
+                    <span class="name">聊天群</span>
+                    <span class="time"></span>
+                    <span class="preview"></span>
+                </li>
+
+
+
+
+
+            </ul>
+        </div>
+        <div class="right">
+            <div class="top"><span>To: <span class="name">聊天群</span></span></div>
+
+            <div class="chat" data-chat="person2" id="user_1">
+            </div>
+
+            <div class="write">
+                <!--<a href="javascript:;" class="write-link attach"></a>-->
+                <input type="text" id="chat_send" />
+                <!--<a href="javascript:;" class="write-link smiley"></a>-->
+                <a href="javascript:;" class="write-link send" style="float: right"></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src='js/jquery.min.js'></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script  src="js/index.js"></script>
+
+<script>
+    var ws;
+    $(function(){
+
+        link();
+    })
+
+    function link () {
+        ws = new WebSocket("ws://127.0.0.1:9502");//连接服务器
+        var user_id=$.cookie('user_id');
+        var user_name=$.cookie('user_name');
+        console.log(user_id);
+        if(!user_id || !user_name){
+            window.location.href='http://127.0.0.1:9502/login.html';
+        }
+        ws.onopen = function(event){
+//            console.log(event);
+            var data={'type':1,'user_id':user_id,'user_name':user_name};
+            ws.send(JSON.stringify(data));
+        };
+        ws.onmessage = function (event) {
+//            console.log(event);
+            var data=JSON.parse(event.data);
+           console.log(data.type);
+           if(data.type==1){
+               str='<div class="conversation-start">'+
+                   '<span>'+data.content+'</span>'+
+                   '</div>'
+               $('#user_1').append(str);
+           }else if(data.type==2){
+               str='<div class="bubble you">'+data.user_name+':'+data.content+'</div>'
+               $("#user_1").append(str);
+           }else{
+               str='';
+               $.each(data.content,function (i,item) {
+                   item=JSON.parse(item)
+                   console.log(item);
+                  if(item.user_id != user_id){
+                      str=str+'<div class="bubble you">'+item.user_name+':'+item.content+'</div>'
+                  }else{
+                      str=str+'<div class="bubble me">'+item.content+'</div>'
+                  }
+               })
+               $('#user_1').append(str);
+            }
+        }
+//        ws.onclose = function(event){alert("已经与服务器断开连接\r\n当前连接状态："+this.readyState);};
+
+        ws.onerror = function(event){console.log("WebSocket异常！");};
+    }
+
+    function sendMsg(){
+        var msg ={'type':2,'content':'TIME-IS:'+Date.parse(new Date())};
+        ws.send(JSON.stringify(msg));
+    }
+
+    $("#chat_send").keypress(function (e) {
+        if (e.which == 13) {
+            var content=$('#chat_send').val();
+            var msg ={'type':2,'content':content};
+            ws.send(JSON.stringify(msg));
+            $('#chat_send').val('');
+            str='<div class="bubble me">'+content+'</div>'
+            $('#user_1').append(str);
+        }
+
+    });
+
+</script>
+
+
+</body>
+
+</html>

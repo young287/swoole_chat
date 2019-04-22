@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <link href='https://fonts.googleapis.com/css?family=Titillium+Web:400,300,600' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="css/normalize.min.css">
+  <link rel="stylesheet" href="css/style_login.css">
+</head>
+
+<body>
+
+  <div class="form">
+      
+      <ul class="tab-group">
+        <li class="tab active"><a href="#signup">注册</a></li>
+        <li class="tab"><a href="#login">登录</a></li>
+      </ul>
+      
+      <div class="tab-content">
+        <div id="signup">
+          <h1>注册界面</h1>
+          
+
+          
+
+
+          <div class="field-wrap">
+            <label>
+              用户名<span class="req">*</span>
+            </label>
+            <input type="text" required autocomplete="off" id="user_name" />
+          </div>
+          
+          <div class="field-wrap">
+            <label>
+              密码<span class="req">*</span>
+            </label>
+            <input type="password"required autocomplete="off" id="pass_word" />
+          </div>
+          
+          <button type="buttion" id="regist" class="button button-block"/>注册</button>
+          
+        </div>
+        
+        <div id="login">   
+          <h1>欢迎回来</h1>
+          
+
+          
+            <div class="field-wrap">
+            <label>
+              用户名<span class="req">*</span>
+            </label>
+            <input type="text"required autocomplete="off" id="username"/>
+          </div>
+          
+          <div class="field-wrap">
+            <label>
+              密码<span class="req">*</span>
+            </label>
+            <input type="password"required autocomplete="off" id="password"/>
+          </div>
+          <button class="button button-block" id="user_login" />登录</button>
+
+        </div>
+        
+      </div><!-- tab-content -->
+      
+</div> <!-- /form -->
+  <script src='js/jquery.min.js'></script>
+  <script type="text/javascript" src="js/jquery.cookie.js"></script>
+
+  <script  src="js/login.js"></script>
+  <script>
+    $('#user_login').click(function () {
+        var user_name=$('#username').val();
+        var pass_word=$('#password').val();
+        if(user_name==''){
+            alert('请输入用户名')
+            return false;
+        }
+        if(pass_word==''){
+            alert('请输入密码')
+            return false;
+        }
+        $.ajax({
+            url: "http://127.0.0.1:9502",
+            type: 'post',
+            data: {'user_name':user_name ,'pass_word': pass_word},
+            success: function (res) {
+                var res=JSON.parse(res)
+            if(res.status=='1'){
+                $.cookie('user_id', res.data.user_id);
+                $.cookie('user_name', res.data.user_name);
+                window.location.href='http://127.0.0.1:9502/chat.html'
+            }else{
+
+            }
+            }
+
+        });
+    })
+
+
+    $('#regist').click(function () {
+        var user_name=$('#user_name').val();
+        var pass_word=$('#pass_word').val();
+        if(user_name==''){
+            alert('请输入用户名')
+            return false;
+        }
+        if(pass_word==''){
+            alert('请输入密码')
+            return false;
+        }
+        $.ajax({
+            url: "http://127.0.0.1:9502",
+            type: 'post',
+            data: {'user_name':user_name ,'pass_word': pass_word},
+            success: function (res) {
+                var res=JSON.parse(res)
+            if(res.status=='1'){
+                $.cookie('user_id', res.data.user_id);
+                $.cookie('user_name', res.data.user_name);
+                window.location.href='http://127.0.0.1:9502/chat.html'
+            }else{
+
+            }
+            }
+
+        });
+    })
+
+  </script>
+
+</body>
+</html>
